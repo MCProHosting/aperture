@@ -1,0 +1,26 @@
+{
+    "name": "mcprohosting/aperture",
+    "description": "Simple Laravel package for taking and applying snapshots of database contents.",
+    "require": {
+        "php": ">=5.4.0",
+        "illuminate/support": "4.1.*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "3.7.*",
+        "mockery/mockery": "0.9.*",
+        "illuminate/database": "4.1.*"
+    },
+    "autoload": {
+        "psr-0": {
+            "Mcprohosting\\Aperture": "src/"
+        }
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Connor Peet",
+            "email": "connor@connorpeet.com"
+        }
+    ],
+    "minimum-stability": "stable"
+}
