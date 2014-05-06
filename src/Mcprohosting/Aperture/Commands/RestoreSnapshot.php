@@ -61,28 +61,37 @@ class RestoreSnapshot extends Command {
 
         foreach (scandir(storage_path() . '/aperture', SCANDIR_SORT_DESCENDING) as $file) {
             if (strpos($file, $this->argument('table') . '_' . $database)) {
-
-                echo '[' . count($selection) . '] Snapshot from ';
-                $parts = explode('_', $file);
-                echo date('H:i, M nS', $parts[0]) . "\n";
-
                 $selection[] = $file;
             }
         }
 
-        $this->ask('Which snapshot do you want to restore from? ');
-
-        if ($this->confirm('This will clear any existing data in ' . $this->argument('table') . '. Continue? [yes|no]', false)) {
-            $file = fopen(storage_path() . '/aperture/' . $selection[0], 'r');
-
-            $this->snapshot->handle = $file;
-            $this->snapshot->restore($database, $this->argument('table'), $this->option('chunk'));
-
-            fclose($file);
-            $this->info('Snapshot restored!');
+        if (count($selection) === 0) {
+            return $this->error('No snapshots found.');
+        } elseif (count($selection) === 1) {
+            $choice = 0;
         } else {
-            $this->error('Restoration aborted');
+            foreach ($selection as $key => $file) {
+                echo '[' . $key . '] Snapshot from ';
+                $parts = explode('_', $file);
+                echo date('H:i, M jS', $parts[0]) . "\n";
+            }
+
+            $choice = (int) $this->ask('Which snapshot do you want to restore from? ');
         }
+
+        if ($this->snapshot->hasRows($database, $this->argument('table'), $this->option('chunk'))
+            && !$this->confirm('This will clear any existing data in ' . $this->argument('table') . '. Continue? [y|N]', false)
+        ) {
+            return $this->error('Restoration aborted');
+        }
+
+        $file = fopen(storage_path() . '/aperture/' . $selection[$choice], 'r');
+
+        $this->snapshot->handle = $file;
+        $this->snapshot->restore($database, $this->argument('table'), $this->option('chunk'));
+
+        fclose($file);
+        $this->info('Snapshot restored!');
     }
 
     /**

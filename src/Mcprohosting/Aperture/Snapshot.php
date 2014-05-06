@@ -15,6 +15,11 @@ class Snapshot
         $this->db = $db;
     }
 
+    public function hasRows($database, $table, $chunk)
+    {
+        return $this->db->connection($database)->table($table)->count() > 0 ? true : false;
+    }
+
     /**
      * Loads the given table into the file.
      *
